@@ -1,20 +1,21 @@
-// connection.js
-const mysql = require('mysql');
+require('dotenv').config();
+const mysql = require("mysql2/promise");
 
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
+const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+
+const pool = mysql.createPool({
+  host: DB_HOST,
+  user: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_NAME,
 });
 
-connection.connect(function(err) {
-  if (err) {
-    console.error('error connecting: ' + err.stack);
-    return;
-  }
+pool.getConnection()
+  .then(result => {
+    console.log('Connected to the MySQL server.');
+  })
+  .catch(err => {
+    console.error('Error connecting to the MySQL server:', err);
+  })
 
-  console.log('connected as id ' + connection.threadId);
-});
-
-module.exports = connection;
+module.exports = pool;
